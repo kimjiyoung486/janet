@@ -1,195 +1,101 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>‘R’ ‘L’ 발음 구별합니다</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <title>English Motivation Quiz</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #f0f4ff, #e0f7ff);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 20px;
-      min-height: 100vh;
-      margin: 0;
+      background: #f0f8ff;
+      text-align: center;
+      padding: 30px;
     }
-
     h1 {
-      font-size: 26px;
-      color: #223355;
-      font-weight: 700;
+      color: #3366cc;
     }
-
+    .question {
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 90%;
+      max-width: 500px;
+      height: 60px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      resize: vertical;
+    }
     button {
-      margin-top: 20px;
-      padding: 12px 24px;
-      font-size: 16px;
-      background-color: #3366ff;
+      padding: 10px 20px;
+      background-color: #4CAF50;
       color: white;
       border: none;
-      border-radius: 30px;
+      border-radius: 20px;
       cursor: pointer;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-      transition: 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    button:hover {
-      background-color: #254eda;
-      transform: scale(1.05);
-    }
-
-    #webcam-container {
-      margin-top: 25px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 4px solid #ddeeff;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    }
-
-    .card {
-      margin-top: 25px;
-      background-color: white;
-      padding: 20px;
-      border-radius: 16px;
-      text-align: center;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-      min-width: 260px;
-    }
-
-    .result-text {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #333;
-    }
-
-    .feedback {
-      font-size: 18px;
-      min-height: 24px;
-      color: #555;
-    }
-
-    .error-message {
-      color: red;
-      font-weight: bold;
       margin-top: 20px;
-      text-align: center;
     }
-
-    .animate-clap {
-      animation: spin 0.6s ease;
+    button:hover {
+      background-color: #45a049;
     }
-
-    .animate-heart {
-      animation: pulse 0.6s ease;
+    .result {
+      display: none;
+      background: #fffbe7;
+      border: 2px dashed #ffc107;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 30px;
     }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); }
+    .result h2 {
+      color: #ff9800;
     }
   </style>
 </head>
 <body>
-  <h1>‘R’ ‘L’ 발음 구별합니다</h1>
-  <button onclick="init()"><i class="fas fa-microphone"></i> 시작하기</button>
-  <div id="webcam-container"></div>
-  <div class="card">
-    <div id="result" class="result-text">발음 분석을 시작하세요</div>
-    <div id="feedback" class="feedback"></div>
+  <h1>🌟 English Motivation Survey 🌟</h1>
+  <form id="quizForm">
+    <div class="question">1. Why are you learning English now?<br><textarea name="q1"></textarea></div>
+    <div class="question">2. What are your short-term and long-term English goals?<br><textarea name="q2"></textarea></div>
+    <div class="question">3. Which English skill do you want to improve the most?<br><textarea name="q3"></textarea></div>
+    <div class="question">4. Have you studied English before? How and how long?<br><textarea name="q4"></textarea></div>
+    <div class="question">5. What topics or situations do you want to talk about in English?<br><textarea name="q5"></textarea></div>
+    <div class="question">6. Do you feel nervous or shy when speaking English? Why?<br><textarea name="q6"></textarea></div>
+    <div class="question">7. What kind of activities do you enjoy when learning English?<br><textarea name="q7"></textarea></div>
+    <div class="question">8. Do you use English outside of class? How?<br><textarea name="q8"></textarea></div>
+    <div class="question">9. What is the hardest part of learning English for you?<br><textarea name="q9"></textarea></div>
+    <div class="question">10. What would make English lessons more fun and helpful for you?<br><textarea name="q10"></textarea></div>
+    <button type="submit">Submit Answers</button>
+  </form>
+
+  <div class="result" id="result">
+    <h2>🎉 Great job, English star! 🎉</h2>
+    <p>Thank you for sharing your thoughts. Janet will use your answers to make your English learning more fun and effective!</p>
+    <button onclick="resetQuiz()">🔁 Take the quiz again</button>
   </div>
-  <div id="error" class="error-message"></div>
 
-  <audio id="clap-sound" src="https://www.soundjay.com/human/applause-8.mp3"></audio>
-
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest"></script>
   <script>
-    const URL = "https://teachablemachine.withgoogle.com/models/MtrbbW4Rg/";
+    document.getElementById("quizForm").addEventListener("submit", function (e) {
+      e.preventDefault();
 
-    let model, webcam, maxPredictions;
-    const resultDiv = document.getElementById("result");
-    const feedbackDiv = document.getElementById("feedback");
-    const errorDiv = document.getElementById("error");
-    const clapSound = document.getElementById("clap-sound");
+      const formData = new FormData(e.target);
+      let body = "English Motivation Quiz Answers:\n\n";
+      formData.forEach((value, key) => {
+        body += `${key}: ${value}\n\n`;
+      });
 
-    async function init() {
-      resultDiv.innerText = "모델을 불러오는 중입니다...";
-      feedbackDiv.innerText = "";
-      errorDiv.innerText = "";
+      // mailto link - opens default mail app
+      const mailTo = `mailto:koreansjane@naver.com?subject=English%20Motivation%20Quiz&body=${encodeURIComponent(body)}`;
+      window.location.href = mailTo;
 
-      try {
-        if (location.protocol !== "https:" && location.hostname !== "localhost") {
-          throw new Error("⚠️ 이 페이지는 HTTPS(보안 연결)에서만 카메라를 사용할 수 있어요.\n주소창이 https:// 로 시작하는지 확인하세요.");
-        }
+      // Show result screen
+      document.getElementById("quizForm").style.display = "none";
+      document.getElementById("result").style.display = "block";
+    });
 
-        const modelURL = URL + "model.json";
-        const metadataURL = URL + "metadata.json";
-
-        model = await tmImage.load(modelURL, metadataURL);
-        maxPredictions = model.getTotalClasses();
-
-        webcam = new tmImage.Webcam(200, 200, true);
-        await webcam.setup();
-        await webcam.play();
-        document.getElementById("webcam-container").appendChild(webcam.canvas);
-
-        window.requestAnimationFrame(loop);
-      } catch (err) {
-        console.error(err);
-        errorDiv.innerText = "❌ 카메라 사용이 불가능합니다.\n" + err.message;
-        resultDiv.innerText = "카메라 연결 실패";
-      }
-    }
-
-    async function loop() {
-      if (webcam) {
-        webcam.update();
-        await predict();
-        window.requestAnimationFrame(loop);
-      }
-    }
-
-    async function predict() {
-      const prediction = await model.predict(webcam.canvas);
-      let display = "";
-      let message = "";
-      let animClass = "";
-
-      for (let i = 0; i < prediction.length; i++) {
-        const label = prediction[i].className.toLowerCase();
-        const prob = prediction[i].probability;
-        const percent = (prob * 100).toFixed(1);
-
-        if (label === "l" && prob >= 0.5) {
-          display = `L: ${percent}% 👏`;
-          message = "Good job!";
-          animClass = "animate-clap";
-          clapSound.play();
-          break;
-        } else if (label === "r" && prob >= 0.5) {
-          display = `R: ${percent}% ❤️`;
-          message = "Awesome job!";
-          animClass = "animate-heart";
-          break;
-        }
-      }
-
-      resultDiv.innerText = display || "발음을 감지하지 못했어요.";
-      resultDiv.className = "result-text " + animClass;
-      feedbackDiv.innerText = message;
+    function resetQuiz() {
+      document.getElementById("quizForm").reset();
+      document.getElementById("quizForm").style.display = "block";
+      document.getElementById("result").style.display = "none";
     }
   </script>
 </body>
